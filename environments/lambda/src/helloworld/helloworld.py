@@ -1,10 +1,20 @@
-import sys
+import boto3
+import json
+import os
 
 def lambda_handler(event, context):
-    print(event)
-    print("hello_world123", file = sys.stdout)
+    client = boto3.client("s3")
+    client.list_buckets()
+
+    client = boto3.client("ec2")
+    client.describe_instances()
 
     return {
-        'statusCode': 200,
-        # 'body': json.dumps(request_info)
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": json.dumps({
+            "Region": os.environ['AWS_REGION']
+        })
     }

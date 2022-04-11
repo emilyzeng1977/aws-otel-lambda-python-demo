@@ -3,37 +3,24 @@ module "hello-lambda-function" {
   version = ">= 2.24.0"
 
   architectures = compact([var.architecture])
-  function_name = var.name
+  function_name = var.function_name
   handler       = var.handler
   runtime       = var.runtime
 
-  create_package         = false
-  local_existing_package = var.output_path
+  create_package         = var.create_package
+  local_existing_package = var.zip_file
 
-  memory_size = 384
-  timeout     = 20
+  memory_size = var.memory_size
+  timeout     = var.timeout
 
-//  layers = compact([
-//    var.collector_layer_arn
-//  ])
-
-//  environment_variables = {
-//    AWS_LAMBDA_EXEC_WRAPPER = "/opt/otel-instrument"
-//  }
-
+  layers = compact([
+    var.collector_layer_arn
+  ])
   tracing_mode = var.tracing_mode
+  environment_variables = var.environment_variables
 
   attach_policy_statements = true
-  policy_statements = {
-    s3 = {
-      effect = "Allow"
-      actions = [
-        "s3:ListAllMyBuckets"
-      ]
-      resources = [
-        "*"
-      ]
-    }
-  }
+  policy_statements = var.policy_statements
+
   depends_on = [data.archive_file.zip_src]
 }
